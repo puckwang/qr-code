@@ -1,0 +1,26 @@
+{
+  "name": "qr-code",
+  "version": "1.0.0",
+  "description": "Use HTML5 canvas draw QRCode",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puckwang/qr-code.git"
+  },
+  "keywords": [
+    "QRCode"
+  ],
+  "author": "Puck Wang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/puckwang/qr-code/issues"
+  },
+  "homepage": "https://github.com/puckwang/qr-code#readme",
+  "dependencies": {
+    "konva": "^2.6.0",
+    "qrcode": "^1.3.3"
+  }
+}
