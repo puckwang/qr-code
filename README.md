@@ -13,17 +13,17 @@ Use HTML5 canvas draw QRCode
 ## Installation
 
 ```sh
-npm install qr-code
+npm install @puckwang/qr-code
 
 // or
 
-yarn add qr-code
+yarn add @puckwang/qr-code
 ```
 
 ## Usage
 ### Example 1
 ```js
-import QrCode from "qr-code";
+import QrCode from "@puckwang/qr-code";
 
 QrCodeModel.create('qrcode1', "Test123", {
     styleOptions: {
@@ -38,7 +38,7 @@ QrCodeModel.create('qrcode1', "Test123", {
 
 ### Example 2
 ```js
-import QrCode from "qr-code";
+import QrCode from "@puckwang/qr-code";
 
 QrCodeModel.create('qrcode1', "Puck go go", {
     styleOptions: {
