@@ -21,6 +21,45 @@ yarn add qr-code
 ```
 
 ## Usage
+### Example 1
+```js
+import QrCode from "qr-code";
+
+QrCodeModel.create('qrcode1', "Test123", {
+    styleOptions: {
+        fill: "#123456"
+    },
+    qrCodeOptions: {
+        errorCorrectionLevel: "H"
+    }
+});
+```
+![Imgur](https://i.imgur.com/BSIQcUY.png)
+
+### Example 2
+```js
+import QrCode from "qr-code";
+
+QrCodeModel.create('qrcode1', "Puck go go", {
+    styleOptions: {
+        shape: 'roundedRect',
+        fillType: 'linearGradient',
+        fillGradient: {
+            type: 'single',
+            startPoint: {x: 0, y: 0},
+            endPoint: {x: 300, y: 300},
+            colorStops: [0, 'red', 1, 'green']
+        }
+    },
+    qrCodeOptions: {
+        errorCorrectionLevel: "H"
+    }
+});
+```
+![Imgur](https://i.imgur.com/cmyg8pb.png)
+
+
+
 
 ## API
 
