@@ -15,7 +15,7 @@ const defaultOptions = {
         colorStops: [0, 'red', 1, 'green']
     },
     shape: "rect",
-    image: {
+    image: { // TODO
         src: "",
         x: 0,
         y: 0,
