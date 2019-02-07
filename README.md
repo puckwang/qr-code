@@ -2,6 +2,10 @@
 
 Use HTML5 canvas draw QRCode
 
+[![npm](https://img.shields.io/npm/v/@puckwang/qr-code.svg?style=flat)](https://www.npmjs.com/package/@puckwang/qr-code)
+[![npm](https://img.shields.io/npm/l/@puckwang/qr-code.svg?style=flat)](https://github.com/puckwang/qr-code/blob/master/LICENSE)
+[![npm](https://img.shields.io/npm/dt/@puckwang/qr-code.svg?style=flat)](https://www.npmjs.com/package/@puckwang/qr-code)
+
 ## Table of Contents
 
 - [Installation](#installation)
