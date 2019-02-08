@@ -220,6 +220,17 @@ class QrCodeRender {
 
         this._stage.add(this._layer);
     }
+
+    download(name, pixelRatio = 3) {
+        let dataURL = this._stage.toDataURL({ pixelRatio });
+
+        let link = document.createElement('a');
+        link.download = name;
+        link.href = dataURL;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
 }
 
 export default QrCodeRender;
