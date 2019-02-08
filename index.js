@@ -21,7 +21,8 @@ const defaultOptions = {
         y: 0,
         width: 0,
         height: 0
-    }
+    },
+    borderSize: 15
 }
 
 class QrCodeRender {
@@ -32,13 +33,16 @@ class QrCodeRender {
     _shapeSize = null;
     _styleOptions = {}
     _qrCodeOptions = {};
+    _canvasOffset = 0;
+    _canvasSize = 0;
 
     _setQrCode(text) {
         let qrcode = QRCode.create(text, this._qrCodeOptions);
         this._qrCodeSize = qrcode.modules.size;
         this._qrCodeData = qrcode.modules.data;
-        this._shapeSize = Math.floor(this._styleOptions.size / this._qrCodeSize);
-        this._styleOptions.size = this._shapeSize * this._qrCodeSize;
+        this._shapeSize = Math.floor((this._styleOptions.size - this._styleOptions.borderSize * 2) / this._qrCodeSize);
+        this._canvasSize = this._shapeSize * this._qrCodeSize + this._styleOptions.borderSize * 2;
+        this._canvasOffset = (this._styleOptions.size - this._canvasSize) / 2 + this._styleOptions.borderSize;
     }
 
     _drawShape(style) {
@@ -48,7 +52,7 @@ class QrCodeRender {
                 for (let c = 0; c < self._qrCodeSize; c++) {
                     for (let r = 0; r < self._qrCodeSize; r++) {
                         if (self._qrCodeData[c * self._qrCodeSize + r] === 1) {
-                            let x = r * self._shapeSize, y = c * self._shapeSize;
+                            let x = r * self._shapeSize + self._canvasOffset, y = c * self._shapeSize + self._canvasOffset;
 
                             switch (self._styleOptions.shape.toLowerCase()) {
                                 case 'rect': // Rect
@@ -204,16 +208,15 @@ class QrCodeRender {
         if (typeof options !== "undefined") {
             options = new Object(options);
 
-            if (options.hasOwnProperty('_qrCodeOptions')) {
-                this._qrCodeOptions = options._qrCodeOptions;
+            if (options.hasOwnProperty('qrCodeOptions')) {
+                this._qrCodeOptions = options.qrCodeOptions;
             }
 
-            if (options.hasOwnProperty('_styleOptions')) {
-                this._styleOptions = options._styleOptions;
+            if (options.hasOwnProperty('styleOptions')) {
+                this._styleOptions = options.styleOptions;
             }
         }
         this._styleOptions = Object.assign(defaultOptions, this._styleOptions);
-
         this._setQrCode(text);
         this._createBackground(element);
         this._drawQrCode();

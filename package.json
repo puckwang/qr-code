@@ -1,6 +1,6 @@
 {
   "name": "@puckwang/qr-code",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Use HTML5 canvas draw QRCode",
   "main": "index.js",
   "scripts": {
