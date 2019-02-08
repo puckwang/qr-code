@@ -24,197 +24,202 @@ const defaultOptions = {
     }
 }
 
-let stage, layer;
-let qrCodeData, qrCodeSize, shapeSize;
-let styleOptions = {}, qrCodeOptions = {};
+class QrCodeRender {
+    _stage = null;
+    _layer = null;
+    _qrCodeData = null;
+    _qrCodeSize = null;
+    _shapeSize = null;
+    _styleOptions = {}
+    _qrCodeOptions = {};
 
-function getQrCode(text) {
-    let qrcode = QRCode.create(text, qrCodeOptions);
-    qrCodeSize = qrcode.modules.size;
-    qrCodeData = qrcode.modules.data;
-    shapeSize = Math.floor(styleOptions.size / qrCodeSize);
-    styleOptions.size = shapeSize * qrCodeSize;
-}
+    _setQrCode(text) {
+        let qrcode = QRCode.create(text, this._qrCodeOptions);
+        this._qrCodeSize = qrcode.modules.size;
+        this._qrCodeData = qrcode.modules.data;
+        this._shapeSize = Math.floor(this._styleOptions.size / this._qrCodeSize);
+        this._styleOptions.size = this._shapeSize * this._qrCodeSize;
+    }
 
-function drawShape(style) {
-    let shapeConfig = {
-        sceneFunc: function (context, shape) {
-            for (let c = 0; c < qrCodeSize; c++) {
-                for (let r = 0; r < qrCodeSize; r++) {
-                    if (qrCodeData[c * qrCodeSize + r] === 1) {
-                        let x = r * shapeSize, y = c * shapeSize;
+    _drawShape(style) {
+        let self = this;
+        let shapeConfig = {
+            sceneFunc: function (context, shape) {
+                for (let c = 0; c < self._qrCodeSize; c++) {
+                    for (let r = 0; r < self._qrCodeSize; r++) {
+                        if (self._qrCodeData[c * self._qrCodeSize + r] === 1) {
+                            let x = r * self._shapeSize, y = c * self._shapeSize;
 
-                        switch (styleOptions.shape.toLowerCase()) {
-                            case 'rect': // Rect
-                                drawRect(context,x, y);
-                                break;
-                            case 'roundedrect': // RoundedRect
-                                RoundedRect(context, x, y, shapeSize / 3);
-                                break;
-                            case 'circle': // Circle
-                                drawCircle(context, x, y, shapeSize / 2);
-                                break;
-                            default:
-                                drawRect(context,x, y);
-                                break;
+                            switch (self._styleOptions.shape.toLowerCase()) {
+                                case 'rect': // Rect
+                                    drawRect(context,x, y);
+                                    break;
+                                case 'roundedrect': // RoundedRect
+                                    RoundedRect(context, x, y, self._shapeSize / 3);
+                                    break;
+                                case 'circle': // Circle
+                                    drawCircle(context, x, y, self._shapeSize / 2);
+                                    break;
+                                default:
+                                    drawRect(context,x, y);
+                                    break;
+                            }
+
+                            context.fillShape(shape);
                         }
-
-                        context.fillShape(shape);
                     }
                 }
-            }
-        },
-    };
+            },
+        };
 
-    Object.assign(shapeConfig, style);
+        Object.assign(shapeConfig, style);
 
-    layer.add(new Konva.Shape(shapeConfig));
+        self._layer.add(new Konva.Shape(shapeConfig));
 
-    function drawRect(context, x, y) {
-        context.beginPath();
-        context.moveTo(x, y);
-        context.lineTo(x + shapeSize, y);
-        context.lineTo(x + shapeSize, y + shapeSize);
-        context.lineTo(x, y + shapeSize);
-        context.closePath();
+        function drawRect(context, x, y) {
+            context.beginPath();
+            context.moveTo(x, y);
+            context.lineTo(x + self._shapeSize, y);
+            context.lineTo(x + self._shapeSize, y + self._shapeSize);
+            context.lineTo(x, y + self._shapeSize);
+            context.closePath();
+        }
+
+        function RoundedRect(context, x, y, r) {
+            context.beginPath();
+            context.moveTo(x + self._shapeSize / 2, y);
+            context.lineTo(x + self._shapeSize - r, y);
+            context.arc(x + self._shapeSize - r, y + r, r, 1.5 * Math.PI, 0);
+            context.lineTo(x + self._shapeSize, y + self._shapeSize / 2);
+            context.arc(x + self._shapeSize - r, y + self._shapeSize - r, r, 0, 0.5 * Math.PI);
+            context.lineTo(x + r, y + self._shapeSize);
+            context.arc(x + r, y + self._shapeSize - r, r, 0.5 * Math.PI, 1 * Math.PI);
+            context.lineTo(x, y + r);
+            context.arc(x + r, y + r, r, 1 * Math.PI, 1.5 * Math.PI, );
+            context.lineTo(x + self._shapeSize / 2, y);
+            context.closePath();
+        }
+
+        function drawCircle(context, x, y, r) {
+            context.beginPath();
+            context.arc(x + r, y + r, r, 0, 2 * Math.PI);
+            context.closePath();
+        }
     }
 
-    function RoundedRect(context, x, y, r) {
-        context.beginPath();
-        context.moveTo(x + shapeSize / 2, y);
-        context.lineTo(x + shapeSize - r, y);
-        context.arc(x + shapeSize - r, y + r, r, 1.5 * Math.PI, 0);
-        context.lineTo(x + shapeSize, y + shapeSize / 2);
-        context.arc(x + shapeSize - r, y + shapeSize - r, r, 0, 0.5 * Math.PI);
-        context.lineTo(x + r, y + shapeSize);
-        context.arc(x + r, y + shapeSize - r, r, 0.5 * Math.PI, 1 * Math.PI);
-        context.lineTo(x, y + r);
-        context.arc(x + r, y + r, r, 1 * Math.PI, 1.5 * Math.PI, );
-        context.lineTo(x + shapeSize / 2, y);
-        context.closePath();
-    }
+    _drawRectShape(style) {
+        for (let c = 0; c < this._qrCodeSize; c++) {
+            for (let r = 0; r < this._qrCodeSize; r++) {
+                if (this._qrCodeData[c * this._qrCodeSize + r] === 1) {
+                    let x = r * this._shapeSize, y = c * this._shapeSize;
+                    let rectConfig = {
+                        x: x,
+                        y: y,
+                        width: this._shapeSize,
+                        height: this._shapeSize,
+                    };
 
-    function drawCircle(context, x, y, r) {
-        context.beginPath();
-        context.arc(x + r, y + r, r, 0, 2 * Math.PI);
-        context.closePath();
-    }
-}
+                    if (this._styleOptions.fillType.toLowerCase() !== 'fillrandom') {
+                        Object.assign(rectConfig, style);
+                    } else {
+                        Object.assign(rectConfig, {fill: this._styleOptions.fills[Math.floor(Math.random() * this._styleOptions.fills.length)]});
+                    }
 
-function drawRectShape(style) {
-    for (let c = 0; c < qrCodeSize; c++) {
-        for (let r = 0; r < qrCodeSize; r++) {
-            if (qrCodeData[c * qrCodeSize + r] === 1) {
-                let x = r * shapeSize, y = c * shapeSize;
-                let rectConfig = {
-                    x: x,
-                    y: y,
-                    width: shapeSize,
-                    height: shapeSize,
-                };
+                    this._layer.add(new Konva.Rect(rectConfig));
 
-                if (styleOptions.fillType.toLowerCase() !== 'fillrandom') {
-                    Object.assign(rectConfig, style);
-                } else {
-                    Object.assign(rectConfig, {fill: styleOptions.fills[Math.floor(Math.random() * styleOptions.fills.length)]});
                 }
-
-                layer.add(new Konva.Rect(rectConfig));
-
             }
         }
     }
-}
 
-function drawQrCode() {
-    switch(styleOptions.fillType.toLowerCase()) {
-        case 'fill':
-            drawShape({fill: styleOptions.fill});
-            break;
-        case 'lineargradient': // linear Gradient
-            if (styleOptions.fillGradient.type.toLowerCase() === 'single') {
-                drawShape({
-                    fillLinearGradientStartPoint: styleOptions.fillGradient.startPoint,
-                    fillLinearGradientEndPoint: styleOptions.fillGradient.endPoint,
-                    fillLinearGradientColorStops: styleOptions.fillGradient.colorStops
-                });
-            } else {
-                drawRectShape({
-                    fillLinearGradientStartPoint: styleOptions.fillGradient.startPoint,
-                    fillLinearGradientEndPoint: styleOptions.fillGradient.endPoint,
-                    fillLinearGradientColorStops: styleOptions.fillGradient.colorStops
-                });
-            }
-            break;
-        case 'circkegradient': // circle Gradient
-            if (styleOptions.fillGradient.type.toLowerCase() === 'single') {
-                drawShape({
-                    fillRadialGradientStartPoint: styleOptions.fillGradient.startPoint,
-                    fillRadialGradientStartRadius: styleOptions.fillGradient.startRadius,
-                    fillRadialGradientEndPoint: styleOptions.fillGradient.endPoint,
-                    fillRadialGradientEndRadius: styleOptions.fillGradient.endRadius,
-                    fillRadialGradientColorStops: styleOptions.fillGradient.colorStops
-                });
-            } else {
-                drawRectShape({
-                    fillRadialGradientStartPoint: styleOptions.fillGradient.startPoint,
-                    fillRadialGradientStartRadius: styleOptions.fillGradient.startRadius,
-                    fillRadialGradientEndPoint: styleOptions.fillGradient.endPoint,
-                    fillRadialGradientEndRadius: styleOptions.fillGradient.endRadius,
-                    fillRadialGradientColorStops: styleOptions.fillGradient.colorStops
-                });
-            }
-            break;
-        case 'fillrandom':
-            drawRectShape();
-            break;
-        default:
-            drawShape({fill: styleOptions.fill});
-            break;
+    _drawQrCode() {
+        switch(this._styleOptions.fillType.toLowerCase()) {
+            case 'fill':
+                this._drawShape({fill: this._styleOptions.fill});
+                break;
+            case 'lineargradient': // linear Gradient
+                if (this._styleOptions.fillGradient.type.toLowerCase() === 'single') {
+                    this._drawShape({
+                        fillLinearGradientStartPoint: this._styleOptions.fillGradient.startPoint,
+                        fillLinearGradientEndPoint: this._styleOptions.fillGradient.endPoint,
+                        fillLinearGradientColorStops: this._styleOptions.fillGradient.colorStops
+                    });
+                } else {
+                    this._drawRectShape({
+                        fillLinearGradientStartPoint: this._styleOptions.fillGradient.startPoint,
+                        fillLinearGradientEndPoint: this._styleOptions.fillGradient.endPoint,
+                        fillLinearGradientColorStops: this._styleOptions.fillGradient.colorStops
+                    });
+                }
+                break;
+            case 'circkegradient': // circle Gradient
+                if (styleOptions.fillGradient.type.toLowerCase() === 'single') {
+                    this._drawShape({
+                        fillRadialGradientStartPoint: this._styleOptions.fillGradient.startPoint,
+                        fillRadialGradientStartRadius: this._styleOptions.fillGradient.startRadius,
+                        fillRadialGradientEndPoint: this._styleOptions.fillGradient.endPoint,
+                        fillRadialGradientEndRadius: this._styleOptions.fillGradient.endRadius,
+                        fillRadialGradientColorStops: this._styleOptions.fillGradient.colorStops
+                    });
+                } else {
+                    this._drawRectShape({
+                        fillRadialGradientStartPoint: this._styleOptions.fillGradient.startPoint,
+                        fillRadialGradientStartRadius: this._styleOptions.fillGradient.startRadius,
+                        fillRadialGradientEndPoint: this._styleOptions.fillGradient.endPoint,
+                        fillRadialGradientEndRadius: this._styleOptions.fillGradient.endRadius,
+                        fillRadialGradientColorStops: this._styleOptions.fillGradient.colorStops
+                    });
+                }
+                break;
+            case 'fillrandom':
+                this._drawRectShape();
+                break;
+            default:
+                this._drawShape({fill: this._styleOptions.fill});
+                break;
+        }
     }
-}
 
-function createBackground(element) {
-    stage = new Konva.Stage({
-        container: element,
-        width: styleOptions.size,
-        height: styleOptions.size
-    });
+    _createBackground(element) {
+        this._stage = new Konva.Stage({
+            container: element,
+            width: this._styleOptions.size,
+            height: this._styleOptions.size
+        });
 
-    layer = new Konva.Layer();
+        this._layer = new Konva.Layer();
 
-    let bg = new Konva.Rect({
-        x: 0,
-        y: 0,
-        width: styleOptions.size,
-        height: styleOptions.size,
-        fill: styleOptions.backgroundColor,
-    });
+        let bg = new Konva.Rect({
+            x: 0,
+            y: 0,
+            width: this._styleOptions.size,
+            height: this._styleOptions.size,
+            fill: this._styleOptions.backgroundColor,
+        });
 
-    layer.add(bg);
-}
+        this._layer.add(bg);
+    }
 
-const QrCode = {
-    create: function (element, text, options) {
+    create(element, text, options) {
         if (typeof options !== "undefined") {
             options = new Object(options);
-            console.log(options);
-            if (options.hasOwnProperty('qrCodeOptions')) {
-                qrCodeOptions = options.qrCodeOptions;
+
+            if (options.hasOwnProperty('_qrCodeOptions')) {
+                this._qrCodeOptions = options._qrCodeOptions;
             }
 
-            if (options.hasOwnProperty('styleOptions')) {
-                styleOptions = options.styleOptions;
+            if (options.hasOwnProperty('_styleOptions')) {
+                this._styleOptions = options._styleOptions;
             }
         }
-        styleOptions = Object.assign(defaultOptions, styleOptions);
+        this._styleOptions = Object.assign(defaultOptions, this._styleOptions);
 
-        getQrCode(text);
-        createBackground(element);
-        drawQrCode();
+        this._setQrCode(text);
+        this._createBackground(element);
+        this._drawQrCode();
 
-        stage.add(layer);
+        this._stage.add(this._layer);
     }
 }
 
-export default QrCode;
+export default QrCodeRender;
