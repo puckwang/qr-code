@@ -28,18 +28,16 @@ const defaultOptions = {
 class QrCodeRender {
 
     constructor() {
-
+        this._stage = null;
+        this._layer = null;
+        this._qrCodeData = null;
+        this._qrCodeSize = null;
+        this._shapeSize = null;
+        this._styleOptions = {}
+        this._qrCodeOptions = {};
+        this._canvasOffset = 0;
+        this._canvasSize = 0;
     }
-
-    _stage = null;
-    _layer = null;
-    _qrCodeData = null;
-    _qrCodeSize = null;
-    _shapeSize = null;
-    _styleOptions = {}
-    _qrCodeOptions = {};
-    _canvasOffset = 0;
-    _canvasSize = 0;
 
     _setQrCode(text) {
         let qrcode = QRCode.create(text, this._qrCodeOptions);
