@@ -25,11 +25,16 @@ yarn add @puckwang/qr-code
 ```
 
 ## Usage
+
+[Example](https://tool.puckwang.com/tools/qrCode/);
+
 ### Example 1
 ```js
 import QrCode from "@puckwang/qr-code";
 
-QrCodeModel.create('qrcode1', "Test123", {
+var qrCode = new QRCode();
+
+qrCode.create('qrcode1', "Test123", {
     styleOptions: {
         fill: "#123456"
     },
@@ -44,7 +49,9 @@ QrCodeModel.create('qrcode1', "Test123", {
 ```js
 import QrCode from "@puckwang/qr-code";
 
-QrCodeModel.create('qrcode1', "Puck go go", {
+var qrCode = new QRCode();
+
+qrCode.create('qrcode1', "Puck go go", {
     styleOptions: {
         shape: 'roundedRect',
         fillType: 'linearGradient',
@@ -62,10 +69,27 @@ QrCodeModel.create('qrcode1', "Puck go go", {
 ```
 ![Imgur](https://i.imgur.com/cmyg8pb.png)
 
+### Example 3
+```js
+import QrCode from "@puckwang/qr-code";
 
+var qrCode = new QRCode();
+
+qrCode.create('qrcode1', "Test123", {
+    styleOptions: {
+        backgroundColor: "#00f900",
+        fill: "#008f00"
+    }
+});
+```
+![Imgur](https://i.imgur.com/kMVNSk5.png)
 
 
 ## API
+
+- [create](#createelemelt-text-options)
+- [download](#downloadname-pixelRatio)
+
 
 ### `create(elemelt, text, [options])`
 
@@ -120,14 +144,19 @@ Setting render QR code options.
  * Description: QR code size, it will automatically fine-tune according to the actual situation.
  * Default: 300
  
+##### `borderSize`
+ * Type: Integer
+ * Description: Size of border of QR code, it will automatically fine-tune according to the actual situation.
+ * Default: 15
+ 
 ##### `shape`
- * Type: Enum('rect', 'roundedRect', 'circle')
+ * Type: Enum(`rect`, `roundedRect`, `circle`, `leaf`)
  * Description: Shape of drak of QR code.
  * Default: "rect"
 
 ##### `fillGradient`
  * Type: Object
-    * `type`: "single" | "multi"
+    * `type`: `single`、`multi`
     * `startPoint`: {x: 0, y: 0}
     * `startRadius: 0
     * `endPoint`: {x: 0, y: 0}
@@ -145,6 +174,18 @@ Setting render QR code options.
     colorStops: [0, 'red', 1, 'green']
 }
 ```
+
+### `download(name, [pixelRatio])`
+
+#### `name`
+ * Type: String
+ * Description: Name of file
+ * Example: `qrcode.png`
+
+#### `pixelRatio`
+ * Type: String
+ * Description: see [devicePixelRatio](https://developer.mozilla.org/en-US/docs/Web/API/Window/devicePixelRatio)
+ * Default: 3
 
 
 ## Support

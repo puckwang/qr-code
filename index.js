@@ -26,6 +26,11 @@ const defaultOptions = {
 }
 
 class QrCodeRender {
+
+    constructor() {
+
+    }
+
     _stage = null;
     _layer = null;
     _qrCodeData = null;
@@ -52,20 +57,27 @@ class QrCodeRender {
                 for (let c = 0; c < self._qrCodeSize; c++) {
                     for (let r = 0; r < self._qrCodeSize; r++) {
                         if (self._qrCodeData[c * self._qrCodeSize + r] === 1) {
-                            let x = r * self._shapeSize + self._canvasOffset, y = c * self._shapeSize + self._canvasOffset;
+                            let x = r * self._shapeSize + self._canvasOffset,
+                                y = c * self._shapeSize + self._canvasOffset;
 
                             switch (self._styleOptions.shape.toLowerCase()) {
                                 case 'rect': // Rect
-                                    drawRect(context,x, y);
+                                    drawRect(context, x, y);
                                     break;
                                 case 'roundedrect': // RoundedRect
-                                    RoundedRect(context, x, y, self._shapeSize / 3);
+                                    drawRoundedRect(context, x, y, self._shapeSize / 3);
+                                    break;
+                                case 'leaf': // Leaf
+                                    drawLeaf(context, x, y, self._shapeSize / 8, self._shapeSize / 2);
                                     break;
                                 case 'circle': // Circle
                                     drawCircle(context, x, y, self._shapeSize / 2);
                                     break;
+                                case 'mergeroundedrect': // MergeRoundedRect
+                                    drawMergeRoundedRect(context, x, y, self._shapeSize / 3, r, c);
+                                    break;
                                 default:
-                                    drawRect(context,x, y);
+                                    drawRect(context, x, y);
                                     break;
                             }
 
@@ -89,17 +101,32 @@ class QrCodeRender {
             context.closePath();
         }
 
-        function RoundedRect(context, x, y, r) {
+        function drawRoundedRect(context, x, y, r) {
             context.beginPath();
             context.moveTo(x + self._shapeSize / 2, y);
             context.lineTo(x + self._shapeSize - r, y);
-            context.arc(x + self._shapeSize - r, y + r, r, 1.5 * Math.PI, 0);
+            drawRoundedAngle(context, x, y, r, 0);
             context.lineTo(x + self._shapeSize, y + self._shapeSize / 2);
-            context.arc(x + self._shapeSize - r, y + self._shapeSize - r, r, 0, 0.5 * Math.PI);
+            drawRoundedAngle(context, x, y, r, 1);
             context.lineTo(x + r, y + self._shapeSize);
-            context.arc(x + r, y + self._shapeSize - r, r, 0.5 * Math.PI, 1 * Math.PI);
+            drawRoundedAngle(context, x, y, r, 2);
             context.lineTo(x, y + r);
-            context.arc(x + r, y + r, r, 1 * Math.PI, 1.5 * Math.PI, );
+            drawRoundedAngle(context, x, y, r, 3);
+            context.lineTo(x + self._shapeSize / 2, y);
+            context.closePath();
+        }
+
+        function drawLeaf(context, x, y, r1, r2) {
+            context.beginPath();
+            context.moveTo(x + self._shapeSize / 2, y);
+            context.lineTo(x + self._shapeSize - r1, y);
+            drawRoundedAngle(context, x, y, r1, 0);
+            context.lineTo(x + self._shapeSize, y + self._shapeSize / 2);
+            drawRoundedAngle(context, x, y, r2, 1);
+            context.lineTo(x + r1, y + self._shapeSize);
+            drawRoundedAngle(context, x, y, r1, 2);
+            context.lineTo(x, y + r2);
+            drawRoundedAngle(context, x, y, r2, 3);
             context.lineTo(x + self._shapeSize / 2, y);
             context.closePath();
         }
@@ -108,6 +135,51 @@ class QrCodeRender {
             context.beginPath();
             context.arc(x + r, y + r, r, 0, 2 * Math.PI);
             context.closePath();
+        }
+
+        /**
+         * 方向依照順時針正方形右上:0 右下:1 左下:2 左上:3
+         * @param context
+         * @param startX
+         * @param startY
+         * @param r
+         * @param direction
+         */
+        function drawRoundedAngle(context, startX, startY, r, direction) {
+            switch (direction) {
+                case 0:
+                    context.arc(startX + self._shapeSize - r, startY + r, r, 1.5 * Math.PI, 0);
+                    break;
+                case 1:
+                    context.arc(startX + self._shapeSize - r, startY + self._shapeSize - r, r, 0, 0.5 * Math.PI);
+                    break;
+                case 2:
+                    context.arc(startX + r, startY + self._shapeSize - r, r, 0.5 * Math.PI, 1 * Math.PI);
+                    break;
+                case 3:
+                    context.arc(startX + r, startY + r, r, 1 * Math.PI, 1.5 * Math.PI);
+                    break;
+            }
+        }
+
+        /**
+         * 方向依照順時針正方形右上:0 右下:1 左下:2 左上:3
+         */
+        function checkIsAngle(r, c, direction) {
+            switch (direction) {
+                case 0:
+                    r++;
+                    return r === self._qrCodeSize || !self._qrCodeData[c * self._qrCodeSize + r];
+                case 1:
+                    c++;
+                    return c === self._qrCodeSize || !self._qrCodeData[c * self._qrCodeSize + r];
+                case 2:
+                    r--;
+                    return r < 0 || !self._qrCodeData[c * self._qrCodeSize + r];
+                case 3:
+                    c--;
+                    return c < 0|| !self._qrCodeData[c * self._qrCodeSize + r];
+            }
         }
     }
 
@@ -137,7 +209,7 @@ class QrCodeRender {
     }
 
     _drawQrCode() {
-        switch(this._styleOptions.fillType.toLowerCase()) {
+        switch (this._styleOptions.fillType.toLowerCase()) {
             case 'fill':
                 this._drawShape({fill: this._styleOptions.fill});
                 break;
@@ -182,6 +254,7 @@ class QrCodeRender {
                 this._drawShape({fill: this._styleOptions.fill});
                 break;
         }
+        this._stage.add(this._layer);
     }
 
     _createBackground(element) {
@@ -204,7 +277,7 @@ class QrCodeRender {
         this._layer.add(bg);
     }
 
-    create(element, text, options) {
+    _importOptions(options) {
         if (typeof options !== "undefined") {
             options = new Object(options);
 
@@ -216,16 +289,19 @@ class QrCodeRender {
                 this._styleOptions = options.styleOptions;
             }
         }
+
         this._styleOptions = Object.assign(defaultOptions, this._styleOptions);
+    }
+
+    create(element, text, options) {
+        this._importOptions(options);
         this._setQrCode(text);
         this._createBackground(element);
         this._drawQrCode();
-
-        this._stage.add(this._layer);
     }
 
     download(name, pixelRatio = 3) {
-        let dataURL = this._stage.toDataURL({ pixelRatio });
+        let dataURL = this._stage.toDataURL({pixelRatio});
 
         let link = document.createElement('a');
         link.download = name;
