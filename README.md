@@ -1,3 +1,5 @@
+> ⚠️ This repo is no longer maintained.
+
 # QR-Code
 
 Use HTML5 canvas draw QRCode
